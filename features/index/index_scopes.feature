@@ -87,6 +87,7 @@ Feature: Index Scoping
     When I follow "Published"
     Then I should see the scope "Published" selected
     And I should see 4 posts in the table
+    Then I should see the context sentence 'Published Posts'
 
   Scenario: Viewing resources with optional scopes
     Given 10 posts exist
