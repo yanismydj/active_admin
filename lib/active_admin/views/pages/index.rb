@@ -19,7 +19,6 @@ module ActiveAdmin
         # Render's the index configuration that was set in the
         # controller. Defaults to rendering the ActiveAdmin::Pages::Index::Table
         def main_content
-          build_context_sentence
           wrap_with_batch_action_form do
             build_table_tools
             build_collection
@@ -78,6 +77,7 @@ module ActiveAdmin
           div :class => "table_tools" do
             build_batch_actions_selector
             build_scopes
+            build_context_sentence
           end
         end
 
