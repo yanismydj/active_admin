@@ -65,6 +65,17 @@ module ActiveAdmin
 
     protected
 
+    def resource
+      if get_resource_ivar
+        get_resource_ivar
+      else
+        if params[:cluster].present?
+          set_resource_ivar(end_of_association_chain.send(:where, {:id => params[:id]}).on_db(params[:cluster]).first)
+        else
+          set_resource_ivar(end_of_association_chain.send(:where, {:id => params[:id]}).first)
+        end
+      end
+    end
     # Returns the full location to the Active Admin template path
     def active_admin_template(template)
       "active_admin/resource/#{template}"
