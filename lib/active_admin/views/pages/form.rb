@@ -35,7 +35,8 @@ module ActiveAdmin
         end
 
         def default_form_path
-          resource.persisted? ? resource_path(resource) : collection_path
+          url = resource.persisted? ? resource_path(resource) : collection_path
+          url += "?cluster=#{params[:cluster]}"
         end
 
         def default_form_config
