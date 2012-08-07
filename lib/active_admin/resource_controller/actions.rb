@@ -122,6 +122,18 @@ module ActiveAdmin
 
       instance_variable_set("@#{parent_config[:instance_name]}", parent)
     end
+    
+    def build_resource
+      if get_resource_ivar
+        get_resource_ivar
+      else
+        if params[:cluster].present?
+          set_resource_ivar(end_of_association_chain.send(method_for_build, *resource_params).on_db(params[:cluster]))
+        else
+          set_resource_ivar(end_of_association_chain.send(method_for_build, *resource_params))
+        end
+      end
+    end
 
     def resource
       if get_resource_ivar
