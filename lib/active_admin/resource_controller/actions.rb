@@ -64,6 +64,35 @@ module ActiveAdmin
     protected :index!, :show!, :new!, :create!, :edit!, :update!
 
     protected
+    
+    # Returns the association chain, with all parents (does not include the
+    # current resource).
+    #
+    def association_chain
+      @association_chain ||=
+        symbols_for_association_chain.inject([begin_of_association_chain]) do |chain, symbol|
+          chain << evaluate_my_parent(symbol, resources_configuration[symbol], chain.last)
+        end.compact.freeze
+    end
+    
+    def evaluate_my_parent(parent_symbol, parent_config, chain = nil) #:nodoc:
+      instantiated_object = instance_variable_get("@#{parent_config[:instance_name]}")
+      return instantiated_object if instantiated_object
+      parent = nil
+      parent = if chain
+        chain.send(parent_config[:collection_name])
+      else
+        parent_config[:parent_class]
+      end
+      
+      if params[:cluster].present?
+        parent = parent.where(:id => params[parent_config[:param]]).on_db(params[:cluster]).first
+      else
+        parent = parent.where(:id => params[parent_config[:param]]).first
+      end
+
+      instance_variable_set("@#{parent_config[:instance_name]}", parent)
+    end
 
     def resource
       if get_resource_ivar
