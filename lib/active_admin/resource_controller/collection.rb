@@ -14,11 +14,7 @@ module ActiveAdmin
         end
 
         def active_admin_collection
-          if params[:cluster].present?
-            scoped_collection.on_db(params[:cluster])
-          else
-            scoped_collection
-          end
+          scoped_collection
         end
 
 

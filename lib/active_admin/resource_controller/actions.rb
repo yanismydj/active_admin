@@ -6,6 +6,7 @@ module ActiveAdmin
     #
     # We ensure that the functionality provided by Inherited
     # Resources is still available within any ResourceController
+    before_filter :set_connection
 
     def index(options={}, &block)
       super(options) do |format|
@@ -65,6 +66,11 @@ module ActiveAdmin
 
     protected
     
+    def set_connection
+      return true unless params[:cluster]
+      SectorRecord.establish_connection(ActiveRecord::Base.configurations[Rails.env][params[:cluster]])
+    end
+    
     # URL to redirect to when redirect implies resource url.
     def smart_resource_url
       url = nil
@@ -93,59 +99,7 @@ module ActiveAdmin
       end
       url
     end
-    
-    # Returns the association chain, with all parents (does not include the
-    # current resource).
-    #
-    def association_chain
-      @association_chain ||=
-        symbols_for_association_chain.inject([begin_of_association_chain]) do |chain, symbol|
-          chain << evaluate_my_parent(symbol, resources_configuration[symbol], chain.last)
-        end.compact.freeze
-    end
-    
-    def evaluate_my_parent(parent_symbol, parent_config, chain = nil) #:nodoc:
-      instantiated_object = instance_variable_get("@#{parent_config[:instance_name]}")
-      return instantiated_object if instantiated_object
-      parent = nil
-      parent = if chain
-        chain.send(parent_config[:collection_name])
-      else
-        parent_config[:parent_class]
-      end
-      
-      if params[:cluster].present?
-        parent = parent.where(:id => params[parent_config[:param]]).on_db(params[:cluster]).first
-      else
-        parent = parent.where(:id => params[parent_config[:param]]).first
-      end
 
-      instance_variable_set("@#{parent_config[:instance_name]}", parent)
-    end
-    
-    def build_resource
-      if get_resource_ivar
-        get_resource_ivar
-      else
-        if params[:cluster].present?
-          set_resource_ivar(end_of_association_chain.send(method_for_build, *resource_params).on_db(params[:cluster]))
-        else
-          set_resource_ivar(end_of_association_chain.send(method_for_build, *resource_params))
-        end
-      end
-    end
-
-    def resource
-      if get_resource_ivar
-        get_resource_ivar
-      else
-        if params[:cluster].present?
-          set_resource_ivar(end_of_association_chain.send(:where, {:id => params[:id]}).on_db(params[:cluster]).first)
-        else
-          set_resource_ivar(end_of_association_chain.send(:where, {:id => params[:id]}).first)
-        end
-      end
-    end
     # Returns the full location to the Active Admin template path
     def active_admin_template(template)
       "active_admin/resource/#{template}"
