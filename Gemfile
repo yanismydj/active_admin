@@ -6,7 +6,6 @@ require File.expand_path('../spec/support/detect_rails_version', __FILE__)
 
 rails_version = detect_rails_version
 gem 'rails',          rails_version
-gem 'db-charmer', :require => 'db_charmer', :git => 'https://github.com/kovyrin/db-charmer.git' # for sharding
 
 case rails_version
 when /^3\.0/

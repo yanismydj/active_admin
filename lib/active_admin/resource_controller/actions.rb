@@ -71,6 +71,20 @@ module ActiveAdmin
       SectorRecord.establish_connection(ActiveRecord::Base.configurations[Rails.env][params[:cluster]])
     end
     
+    def build_resource
+      if get_resource_ivar
+        get_resource_ivar
+      else
+        if type = resource_params[0]['type']
+          base_ivar = end_of_association_chain.send(method_for_build, *resource_params)
+          new_ivar = type.constantize.new(base_ivar.attributes)
+          set_resource_ivar(new_ivar)
+        else
+          set_resource_ivar(end_of_association_chain.send(method_for_build, *resource_params))
+        end
+      end
+    end
+    
     # URL to redirect to when redirect implies resource url.
     def smart_resource_url
       url = nil
