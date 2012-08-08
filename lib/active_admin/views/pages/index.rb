@@ -83,7 +83,11 @@ module ActiveAdmin
         def render_blank_slate
           blank_slate_content = I18n.t("active_admin.blank_slate.content", :resource_name => active_admin_config.plural_resource_name)
           if controller.action_methods.include?('new')
-            blank_slate_content += " " + link_to(I18n.t("active_admin.blank_slate.link"), new_resource_path)
+            if params[:cluster].present?
+              blank_slate_content += " " + link_to(I18n.t("active_admin.blank_slate.link"), new_resource_path(:cluster => params[:cluster]))
+            else
+              blank_slate_content += " " + link_to(I18n.t("active_admin.blank_slate.link"), new_resource_path)
+            end
           end
           insert_tag(view_factory.blank_slate, blank_slate_content)
         end
