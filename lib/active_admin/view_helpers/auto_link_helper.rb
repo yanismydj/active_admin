@@ -15,7 +15,8 @@ module ActiveAdmin
         content = link_content || display_name(resource)
         if registration = active_admin_resource_for(resource.class)
           begin
-            content = link_to(content, send(registration.route_instance_path, resource))
+            cluster = resource.cluster_name.present? && params[:cluster].present? ? {:cluster => params[:cluster]} : {}
+            content = link_to(content, send(registration.route_instance_path, resource, cluster))
           rescue
           end
         end
