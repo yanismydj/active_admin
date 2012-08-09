@@ -67,8 +67,11 @@ module ActiveAdmin
     protected
     
     def set_connection
-      return true unless params[:cluster]
-      SectorRecord.on_cluster(params[:cluster]) do
+      if params[:cluster].present?
+        SectorRecord.on_cluster(params[:cluster]) do
+          yield
+        end
+      else
         yield
       end
     end
