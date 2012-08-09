@@ -31,7 +31,8 @@ module ActiveAdmin
 
     def self.find_for_resource_in_namespace(resource, namespace)
       where(:resource_type => resource_type(resource),
-            :resource_id => resource_id_cast(resource), 
+            :resource_id => resource_id_cast(resource),
+            :cluster    => resource.cluster_name,
             :namespace => namespace.to_s)
     end
 

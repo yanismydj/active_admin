@@ -44,13 +44,14 @@ ActiveAdmin::Event.subscribe ActiveAdmin::Application::LoadEvent do |app|
           flash[:notice] = flash[:notice].dup if flash[:notice]
           comment = ActiveAdmin::Comment.find(params[:id])
           resource_config = active_admin_config.namespace.resource_for(comment.resource.class)
-          redirect_to send(resource_config.route_instance_path, comment.resource)
+          redirect_to send(resource_config.route_instance_path, comment.resource, :cluster => comment.resource.cluster_name)
         end
 
         # Store the author and namespace
         before_save do |comment|
           comment.namespace = active_admin_config.namespace.name
           comment.author = current_active_admin_user
+          comment.cluster = comment.resource.cluster_name
         end
 
         # Redirect to the resource show page when failing to add a comment
@@ -58,7 +59,7 @@ ActiveAdmin::Event.subscribe ActiveAdmin::Application::LoadEvent do |app|
         controller do
           def create
             create! do |success, failure|
-              failure.html do 
+              failure.html do
                 resource_config = active_admin_config.namespace.resource_for(@comment.resource.class)
                 flash[:error] = I18n.t('active_admin.comments.errors.empty_text')
                 redirect_to send(resource_config.route_instance_path, @comment.resource)
