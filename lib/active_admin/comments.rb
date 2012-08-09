@@ -64,6 +64,9 @@ ActiveAdmin::Event.subscribe ActiveAdmin::Application::LoadEvent do |app|
                 flash[:error] = I18n.t('active_admin.comments.errors.empty_text')
                 redirect_to :back #send(resource_config.route_instance_path, @comment.resource)
               end
+              success.html do
+                redirect_to :back
+              end
             end
           end
         end
