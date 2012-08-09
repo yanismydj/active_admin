@@ -6,7 +6,7 @@ module ActiveAdmin
     #
     # We ensure that the functionality provided by Inherited
     # Resources is still available within any ResourceController
-    before_filter :set_connection
+    around_filter :set_connection
 
     def index(options={}, &block)
       super(options) do |format|
@@ -68,7 +68,9 @@ module ActiveAdmin
     
     def set_connection
       return true unless params[:cluster]
-      SectorRecord.establish_connection(ActiveRecord::Base.configurations[Rails.env][params[:cluster]])
+      SectorRecord.on_cluster(params[:cluster]) do
+        yield
+      end
     end
     
     def build_resource
