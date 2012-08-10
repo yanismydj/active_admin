@@ -66,9 +66,13 @@ module ActiveAdmin
 
     protected
     
+    def realm_class
+       Module.const_defined?('SectorRecord') ? SectorRecord : RealmRecord
+    end
+    
     def set_connection
       if params[:cluster].present?
-        SectorRecord.on_cluster(params[:cluster]) do
+        realm_class.on_cluster(params[:cluster]) do
           yield
         end
       else
