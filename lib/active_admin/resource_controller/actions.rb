@@ -67,7 +67,10 @@ module ActiveAdmin
     protected
     
     def realm_class
-       Module.const_defined?('SectorRecord') ? SectorRecord : RealmRecord
+       @realm_class = ClusterRecord if Module.const_defined?('ClusterRecord')
+       @realm_class = SectorRecord if Module.const_defined?('SectorRecord')
+       @realm_class = RealmRecord if Module.const_defined?('RealmRecord')
+       @realm_class
     end
     
     def set_connection
